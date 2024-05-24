@@ -1,22 +1,35 @@
 import { useState } from 'react'
-
+import axios from "axios";
 
 function App() {
   const [emailContent, setEmailContent] = useState('');
   const [result, setResult] = useState('');
  
+  
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const response = await fetch('http://localhost:5000/predict', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ content: emailContent }),
-    });
-    const data = await response.json();
-    setResult(data.result);
+    event.preventDefault();  // prevent refreshing the page
+
+    try{
+      const response = await axios.post('http://localhost:5000/predict', {
+       headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: emailContent }),
+      });
+      const data = await response.json();
+      setResult(data.result);
+    }
+    
+    catch(error){
+      console.log(error);
+    }
+
+
   };
+
+  const clearContent = () => {
+      setEmailContent('');
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -32,6 +45,7 @@ function App() {
           />
         </div>
         <button type="submit">Check Email</button>
+        <button onClick={clearContent}>Clear</button>
       </form>
       {result && (
         <div>
